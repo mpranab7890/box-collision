@@ -1,8 +1,8 @@
 function collisionWithWall(ball) {
-    if (ball.x >= canvas.width - ball.radius || ball.x <= ball.radius) {
+    if (ball.x + ball.dx >= canvas.width - ball.radius || ball.x + ball.dx <= ball.radius) {
         ball.dx = -ball.dx;
     }
-    if (ball.y >= canvas.height - ball.radius || ball.y <= ball.radius) {
+    if (ball.y + ball.dy >= canvas.height - ball.radius || ball.y + ball.dy <= ball.radius) {
         ball.dy = -ball.dy;
     }
     // this.x += this.dx;
@@ -18,30 +18,37 @@ function collisionWithBall(currentBall, balls) {
             var distance = (Math.sqrt(DX * DX + DY * DY)) || 1;
 
             if (distance <= currentBall.radius + ball.radius) {
-                var nx = DX / distance;
-                var ny = DY / distance;
+                let angle = Math.atan2(DY, DX);
+                let sin = Math.sin(angle);
+                let cos = Math.cos(angle);
 
-                var relvx = ball.dx - currentBall.dx;
-                var relvy = ball.dy - currentBall.dy;
+                // ball1 perpendicular velocities
+                let vx1 = (currentBall.dx * cos + currentBall.dy * sin);
+                let vy1 = (currentBall.dy * cos - currentBall.dx * sin);
 
-                var speed = (relvx * nx + relvy * ny);
-                currentBall.dx += (speed * nx);
-                currentBall.dy += (speed * ny);
-                ball.dx -= (speed * nx);
-                ball.dy -= (speed * ny);
-                // ball.dx = -ball.dx;
-                // ball.dy = -ball.dy;
-                // currentBall.x += currentBall.dx * Math.random();
-                // currentBall.y += currentBall.dy * Math.random();
+                // ball2 perpendicular velocities
+                let vx2 = (ball.dx * cos + ball.dy * sin);
+                let vy2 = (ball.dy * cos - ball.dx * sin);
 
-                currentBall.x += currentBall.dx;
-                currentBall.y += currentBall.dy;
-                ball.x += ball.dx;
-                ball.y += ball.dy;
+                // swapping the x velocity     
+                currentBall.dx = vx2 * cos - vy1 * sin;
+                currentBall.dy = vy1 * cos + vx2 * sin;
+                ball.dx = vx1 * cos - vy2 * sin;
+                ball.dy = vy2 * cos + vx1 * sin;
+
+
 
                 collisionWithWall(currentBall);
                 collisionWithWall(ball);
+
+                // console.log(currentBall.dx, currentBall.dy)
+
+                // currentBall.x += currentBall.dx;
+                // currentBall.y += currentBall.dy;
+                // ball.x += ball.dx;
+                // ball.y += ball.dy;
             }
         }
     });
 }
+
